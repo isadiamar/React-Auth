@@ -1,10 +1,11 @@
 import { useState } from "react";
 import useInput from "./../hooks/use-input";
 import classes from "./AuthForm.module.css";
-import { signUp } from "../../api-calls";
+import { authentication } from "../../api-calls";
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [, setIsLoading] = useState(false);
   //Email Input Hook
   const {
     value: enteredEmail,
@@ -40,15 +41,17 @@ const AuthForm = () => {
   //Submit Handler
   const submitHandler = (event) => {
     event.preventDefault();
-
+    let url;
     //Login Mode
     if (isLogin) {
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=";
     }
-
     //Sign Up Mode
     else {
-     signUp(enteredEmail, enteredPassword);
+      url = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=";
     }
+    authentication(url, enteredEmail, enteredPassword);
 
     //Clear inputs
     resetEmail();
@@ -69,7 +72,7 @@ const AuthForm = () => {
     <section className={classes.auth}>
       <h1>{isLogin ? "Login" : "Sign Up"}</h1>
       <form onSubmit={submitHandler}>
-        {/*password*/}
+        {/*Email*/}
         <div className={emailForm}>
           <label htmlFor="email">Your Email</label>
           <input
@@ -104,7 +107,7 @@ const AuthForm = () => {
           )}
         </div>
 
-        {/*Submit Form*/}
+        {/*Submit Button*/}
         <div className={classes.actions}>
           <button disabled={!formIsValid}>
             {isLogin ? "Login" : "Create Account"}

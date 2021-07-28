@@ -1,6 +1,6 @@
-export const signUp = (userEmail, userPassword) => {
+export const authentication = (url,userEmail, userPassword) => {
   fetch(
-    `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${process.env.REACT_APP_AUTH_API_KEY}`,
+    `${url}${process.env.REACT_APP_AUTH_API_KEY}`,
     {
       method: "POST",
       body: JSON.stringify({
@@ -9,19 +9,8 @@ export const signUp = (userEmail, userPassword) => {
         returnSecureToken: true,
       }),
       headers: {
-        "Content-type": "application/json",
+        "Content-Type": "application/json",
       },
     }
-  ).then((res) => {
-    //OK
-    if (res.ok) {
-      //...
-    }
-    //ERROR
-    else {
-      res.json().then((data) => {
-        console.log(data);
-      });
-    }
-  });
+  );
 };
