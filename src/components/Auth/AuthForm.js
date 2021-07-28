@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import useInput from "./../hooks/use-input";
 import classes from "./AuthForm.module.css";
 import { authentication } from "../../api-calls";
+import AuthContext from "../../store/auth-context";
 
 const AuthForm = () => {
+  //login State
   const [isLogin, setIsLogin] = useState(true);
-  const [, setIsLoading] = useState(false);
+
+  //Auth Context
+  const authCtx = useContext(AuthContext);
+
   //Email Input Hook
   const {
     value: enteredEmail,
@@ -42,16 +47,25 @@ const AuthForm = () => {
   const submitHandler = (event) => {
     event.preventDefault();
     let url;
+
     //Login Mode
     if (isLogin) {
       url =
         "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=";
     }
+
     //Sign Up Mode
     else {
       url = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=";
     }
-    authentication(url, enteredEmail, enteredPassword);
+
+    authentication(url, enteredEmail, enteredPassword)
+      .then((data) => {
+        authCtx.login(data.idToken);
+      })
+      .catch((err) => {
+        alert(err.message);
+      });
 
     //Clear inputs
     resetEmail();
