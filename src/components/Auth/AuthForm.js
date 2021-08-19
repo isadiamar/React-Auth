@@ -1,8 +1,8 @@
 import { useState, useContext } from "react";
 import useInput from "./../hooks/use-input";
 import classes from "./AuthForm.module.css";
-import { authentication } from "../../api-calls";
 import AuthContext from "../../store/auth-context";
+import { authentication } from "./../../api-calls";
 
 const AuthForm = () => {
   //login State
@@ -46,6 +46,7 @@ const AuthForm = () => {
   //Submit Handler
   const submitHandler = (event) => {
     event.preventDefault();
+
     let url;
 
     //Login Mode
@@ -59,10 +60,25 @@ const AuthForm = () => {
       url = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=";
     }
 
+    //Authentication Function
     authentication(url, enteredEmail, enteredPassword)
-      .then((data) => {
-        authCtx.login(data.idToken);
+      .then((res) => {
+        //SUCCESS
+        if (res.ok) {
+          const data = res.json();
+          return data;
+        }
+        //ERROR
+        else {
+          const data = res.json();
+          let errorMessage = "Authentication failed!";
+          if (data && data.error && data.error.message) {
+            errorMessage = data.error.message;
+          }
+          throw new Error(errorMessage);
+        }
       })
+      .then((data) => authCtx.login(data.idToken))
       .catch((err) => {
         alert(err.message);
       });
@@ -86,7 +102,7 @@ const AuthForm = () => {
     <section className={classes.auth}>
       <h1>{isLogin ? "Login" : "Sign Up"}</h1>
       <form onSubmit={submitHandler}>
-        {/*Email*/}
+        {/*Email Input*/}
         <div className={emailForm}>
           <label htmlFor="email">Your Email</label>
           <input
@@ -103,7 +119,8 @@ const AuthForm = () => {
             </p>
           )}
         </div>
-        {/*Password*/}
+
+        {/*Password Input*/}
         <div className={passwordForm}>
           <label htmlFor="password">Your Password</label>
           <input
