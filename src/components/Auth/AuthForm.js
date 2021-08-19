@@ -63,12 +63,12 @@ const AuthForm = () => {
     //Authentication Function
     authentication(url, enteredEmail, enteredPassword)
       .then((res) => {
-        //SUCCESS
+        //SUCCESS - > return the data in JSON
         if (res.ok) {
           const data = res.json();
           return data;
         }
-        //ERROR
+        //ERROR - throw a message error
         else {
           const data = res.json();
           let errorMessage = "Authentication failed!";
@@ -78,8 +78,12 @@ const AuthForm = () => {
           throw new Error(errorMessage);
         }
       })
-      .then((data) => authCtx.login(data.idToken))
+      .then(
+        //If OK -> Log the user
+        (data) => authCtx.login(data.idToken)
+      )
       .catch((err) => {
+        //If no OK - > alert with the error
         alert(err.message);
       });
 
