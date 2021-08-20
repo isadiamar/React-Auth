@@ -1,10 +1,14 @@
 import { useState, useContext } from "react";
+import { useHistory } from "react-router-dom";
 import useInput from "./../hooks/use-input";
 import classes from "./AuthForm.module.css";
 import AuthContext from "../../store/auth-context";
 import { authentication } from "./../../api-calls";
 
 const AuthForm = () => {
+  //History Object
+  const history = useHistory();
+
   //login State
   const [isLogin, setIsLogin] = useState(true);
 
@@ -79,8 +83,22 @@ const AuthForm = () => {
         }
       })
       .then(
-        //If OK -> Log the user
-        (data) => authCtx.login(data.idToken)
+        //If OK -> Login the user
+        (data) => {
+          // 1 -Transform the expiresIn data in a number in ms
+          const expiresInTimeData = +data.expiresIn * 1000;
+
+          // 2 -Transform the expiration Time in a date
+          const expirationTime = new Date(
+            new Date().getTime() + expiresInTimeData
+          );
+
+          //2 - LogIn the user
+          authCtx.login(data.idToken, expirationTime);
+
+          //4 - Redirect to the Starting Page
+          history.replace("/");
+        }
       )
       .catch((err) => {
         //If no OK - > alert with the error
